@@ -3,641 +3,583 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Generator prompta · Nacrt u 4 sloja</title>
+<title>Generator prompta</title>
 <style>
 :root{
-  --bg:#0f2230; --bg2:#13293a; --paper:#f4f2ec; --ink:#16231d;
-  --accent:#3fae7f; --accent-d:#2c8a62; --line:#26445a; --lineL:#d9ddd6;
-  --muted:#8aa4b3; --grid:rgba(160,200,220,.09); --amber:#e0a34a;
-  --card:#ffffff; --tint:#eaf1ee;
+  --bg:#0f2230;--bg2:#13293a;--paper:#f4f2ec;--ink:#16231d;
+  --accent:#3fae7f;--accent-d:#2c8a62;--line:#26445a;--lineL:#d9ddd6;
+  --muted:#8aa4b3;--grid:rgba(160,200,220,.09);--amber:#e0a34a;--tint:#eaf1ee;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{
-  font-family:"Segoe UI",system-ui,-apple-system,sans-serif;
-  background:var(--bg); color:#e8eef1; line-height:1.55;
-  -webkit-font-smoothing:antialiased;
-}
+body{font-family:"Segoe UI",system-ui,-apple-system,sans-serif;background:var(--bg);
+  color:#e8eef1;line-height:1.55;-webkit-font-smoothing:antialiased}
 .mono{font-family:"Cascadia Code",ui-monospace,Menlo,Consolas,monospace}
 
-/* ---------- HEADER ---------- */
-header{
-  padding:38px 20px 30px; text-align:center;
-  background:
-    repeating-linear-gradient(0deg,transparent 0 25px,var(--grid) 25px 26px),
+header{padding:34px 20px 28px;text-align:center;
+  background:repeating-linear-gradient(0deg,transparent 0 25px,var(--grid) 25px 26px),
     repeating-linear-gradient(90deg,transparent 0 25px,var(--grid) 25px 26px),
     linear-gradient(180deg,var(--bg2),var(--bg));
-  border-bottom:2px solid var(--line);
-}
+  border-bottom:2px solid var(--line)}
 header .eyebrow{letter-spacing:.3em;font-size:.68rem;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
-header h1{font-size:clamp(1.6rem,4.4vw,2.4rem);font-weight:800;line-height:1.12}
-header p{color:var(--muted);max-width:560px;margin:10px auto 0;font-size:.96rem}
+header h1{font-size:clamp(1.6rem,4.4vw,2.3rem);font-weight:800;line-height:1.12}
+header p{color:var(--muted);max-width:560px;margin:10px auto 0;font-size:.94rem}
 
-/* ---------- LAYOUT ---------- */
-.app{max-width:1180px;margin:0 auto;padding:26px 20px 60px;
+.app{max-width:1180px;margin:0 auto;padding:24px 20px 60px;
   display:grid;grid-template-columns:1fr 400px;gap:26px;align-items:start}
 @media(max-width:920px){.app{grid-template-columns:1fr}}
 
-/* ---------- PROFILE CHIPS ---------- */
-.profiles{margin-bottom:22px}
-.blabel{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.blabel{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+.profiles{margin-bottom:20px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{
-  background:transparent;border:1px solid var(--line);color:#cfe0ea;
-  padding:8px 14px;border-radius:999px;font-size:.86rem;font-weight:600;
-  cursor:pointer;transition:.16s;font-family:inherit;
-}
+.chip{background:transparent;border:1px solid var(--line);color:#cfe0ea;padding:8px 14px;
+  border-radius:999px;font-size:.85rem;font-weight:600;cursor:pointer;transition:.16s;font-family:inherit}
 .chip:hover{border-color:var(--accent);color:#fff}
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#08221a}
+.phint{font-size:.78rem;color:var(--muted);margin-top:8px;font-style:italic}
 
-/* ---------- ROOMS ---------- */
-.room{
-  background:var(--bg2);border:1px solid var(--line);border-radius:14px;
-  padding:18px 18px 6px;margin-bottom:16px;position:relative;overflow:hidden;
-}
-.room::before{
-  content:"";position:absolute;inset:0;pointer-events:none;
+.room{background:var(--bg2);border:1px solid var(--line);border-radius:14px;
+  padding:18px 18px 8px;margin-bottom:15px;position:relative;overflow:hidden}
+.room::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
   background:repeating-linear-gradient(0deg,transparent 0 23px,var(--grid) 23px 24px),
-            repeating-linear-gradient(90deg,transparent 0 23px,var(--grid) 23px 24px);
-  opacity:.5;
-}
+    repeating-linear-gradient(90deg,transparent 0 23px,var(--grid) 23px 24px)}
 .room>*{position:relative}
-.room-head{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.room-head{display:flex;align-items:center;gap:12px;margin-bottom:2px}
 .rnum{width:34px;height:34px;border-radius:9px;background:var(--accent);color:#08221a;
   display:flex;align-items:center;justify-content:center;font-weight:800;flex:0 0 auto}
-.room-head h2{font-size:1.12rem;font-weight:800}
-.room-head .rsub{color:var(--muted);font-size:.8rem;margin-top:1px}
+.room-head h2{font-size:1.1rem;font-weight:800}
+.room-head .rsub{color:var(--muted);font-size:.79rem;margin-top:1px}
 
 .field{margin:14px 0 4px}
-.field .flab{font-size:.78rem;color:#a9c3d1;font-weight:600;margin-bottom:8px}
-.field .flab .hint{color:var(--muted);font-weight:400}
+.flab{font-size:.78rem;color:#a9c3d1;font-weight:600;margin-bottom:8px}
+.flab .hint{color:var(--muted);font-weight:400}
 .opts{display:flex;flex-wrap:wrap;gap:7px}
-.opt{
-  background:#0e2130;border:1px solid var(--line);color:#c6d7e1;
-  padding:7px 12px;border-radius:8px;font-size:.83rem;cursor:pointer;
-  transition:.15s;font-family:inherit;text-align:left;
-}
+.opt{background:#0e2130;border:1px solid var(--line);color:#c6d7e1;padding:7px 12px;
+  border-radius:8px;font-size:.83rem;cursor:pointer;transition:.15s;font-family:inherit;text-align:left}
 .opt:hover{border-color:var(--accent);color:#fff}
 .opt[aria-pressed="true"]{background:rgba(63,174,127,.16);border-color:var(--accent);color:#dcf3e9}
-.opt.free{display:flex;align-items:center;gap:6px}
-.opt input{background:transparent;border:none;color:#fff;outline:none;font-family:inherit;font-size:.83rem;width:150px}
-.opt input::placeholder{color:var(--muted)}
 
-textarea.ctx{
-  width:100%;background:#0e2130;border:1px solid var(--line);border-radius:8px;
-  color:#e8eef1;padding:10px 12px;font-family:inherit;font-size:.86rem;resize:vertical;
-  min-height:60px;
-}
-textarea.ctx:focus{outline:none;border-color:var(--accent)}
+textarea.ctx,.spec-input input{width:100%;background:#0e2130;border:1px solid var(--line);
+  border-radius:8px;color:#e8eef1;padding:10px 12px;font-family:inherit;font-size:.86rem}
+textarea.ctx{resize:vertical;min-height:58px}
+textarea.ctx:focus,.spec-input input:focus{outline:none;border-color:var(--accent)}
+.spec-input{display:flex;gap:8px}
+.btn-add{background:var(--accent);color:#08221a;border:none;border-radius:8px;padding:0 16px;
+  font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit;white-space:nowrap}
+.btn-add:hover{background:var(--accent-d);color:#fff}
+.spec-list{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.spec-list:empty{margin-top:0}
+.spec-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(63,174,127,.14);
+  border:1px solid var(--accent);border-radius:8px;padding:6px 8px 6px 12px;font-size:.83rem;color:#dcf3e9}
+.spec-tag button{border:none;background:transparent;color:#8fd3b6;cursor:pointer;font-size:1.05rem;
+  line-height:1;width:18px;height:18px;border-radius:50%;font-family:inherit}
+.spec-tag button:hover{background:rgba(176,74,58,.3);color:#ffd7cf}
 
-/* ---------- OUTPUT PANEL ---------- */
 .panel{position:sticky;top:16px}
-.panel-card{
-  background:var(--paper);color:var(--ink);border-radius:16px;overflow:hidden;
-  box-shadow:0 20px 50px rgba(0,0,0,.4);
-}
-.panel-top{
-  background:var(--bg2);color:#e8eef1;padding:14px 18px;
-  display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--accent);
-}
-.panel-top .pt-title{font-weight:800;font-size:.98rem}
-.panel-top .pt-title span{color:var(--accent)}
-.badge{background:var(--accent);color:#08221a;font-size:.68rem;font-weight:800;
-  padding:3px 9px;border-radius:6px;letter-spacing:.08em}
-.prompt-body{
-  padding:18px;font-size:.92rem;line-height:1.7;white-space:pre-wrap;
-  min-height:220px;max-height:52vh;overflow:auto;
-}
-.prompt-body .plabel{color:var(--accent-d);font-weight:800}
-.prompt-body .empty{color:#9aa39d;font-style:italic}
-.actions{display:flex;gap:10px;padding:0 18px 18px}
-.btn{flex:1;border:none;border-radius:10px;padding:11px;font-weight:700;font-size:.9rem;
+.panel-card{background:var(--paper);color:var(--ink);border-radius:16px;overflow:hidden;
+  box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.panel-top{background:var(--bg2);color:#e8eef1;padding:14px 18px;display:flex;align-items:center;
+  justify-content:space-between;border-bottom:2px solid var(--accent)}
+.pt-title{font-weight:800;font-size:.98rem}.pt-title span{color:var(--accent)}
+.badge{background:var(--accent);color:#08221a;font-size:.68rem;font-weight:800;padding:3px 9px;
+  border-radius:6px;letter-spacing:.08em}
+.prompt-body{padding:18px;font-size:.92rem;line-height:1.7;white-space:pre-wrap;
+  min-height:200px;max-height:48vh;overflow:auto}
+.plabel{color:var(--accent-d);font-weight:800}
+.empty{color:#9aa39d;font-style:italic}
+.warn{margin:0 18px 10px;background:#fdf3e3;border-left:4px solid var(--amber);border-radius:8px;
+  padding:9px 12px;font-size:.8rem;color:#6b4d1c;display:none}
+.warn.show{display:block}
+
+.actions{display:flex;gap:9px;padding:0 18px 10px}
+.btn{flex:1;border:none;border-radius:10px;padding:11px;font-weight:700;font-size:.88rem;
   cursor:pointer;font-family:inherit;transition:.15s}
-.btn.copy{background:var(--accent);color:#08221a}
-.btn.copy:hover{background:var(--accent-d);color:#fff}
-.btn.reset{background:transparent;border:1px solid var(--lineL);color:#5a655e}
-.btn.reset:hover{border-color:#b04a3a;color:#b04a3a}
-.copied{text-align:center;color:var(--accent-d);font-size:.82rem;font-weight:600;
-  height:16px;margin:-6px 0 10px;opacity:0;transition:.2s}
-.copied.show{opacity:1}
-
-.tip{background:var(--tint);border-left:4px solid var(--accent);border-radius:8px;
-  padding:11px 14px;margin:16px 18px 4px;font-size:.82rem;color:#2c4a3c}
-.tip b{color:var(--accent-d)}
-
-/* favorites */
-.fav-row{display:flex;gap:10px;padding:0 18px 4px}
+.btn.copy{background:var(--accent);color:#08221a}.btn.copy:hover{background:var(--accent-d);color:#fff}
+.btn.share{background:var(--amber);color:#3a2606}.btn.share:hover{background:#c98a2e;color:#fff}
 .btn.save{background:var(--bg2);color:#dcf3e9;border:1px solid var(--accent)}
 .btn.save:hover{background:var(--accent);color:#08221a}
-.btn.try{background:var(--amber);color:#3a2606}
-.btn.try:hover{background:#c98a2e;color:#fff}
-.favs{padding:6px 18px 4px}
-.favs .fl{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:#8a958d;margin:6px 0 8px}
+.btn.reset{background:transparent;border:1px solid var(--lineL);color:#5a655e}
+.btn.reset:hover{border-color:#b04a3a;color:#b04a3a}
+.copied{text-align:center;color:var(--accent-d);font-size:.82rem;font-weight:600;height:16px;
+  margin:-4px 0 8px;opacity:0;transition:.2s}
+.copied.show{opacity:1}
+
+/* share fallback box */
+.sharebox{display:none;margin:0 18px 12px}
+.sharebox.show{display:block}
+.sharebox textarea{width:100%;min-height:110px;background:#fff;border:2px solid var(--amber);
+  border-radius:10px;padding:11px;font-family:ui-monospace,Menlo,monospace;font-size:.82rem;
+  color:var(--ink);resize:vertical}
+.sharebox .sb-hint{font-size:.78rem;color:#6b4d1c;margin-top:6px}
+
+.favs{padding:4px 18px 6px}
+.fl{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:#8a958d;margin:4px 0 8px}
 .fav-chips{display:flex;flex-wrap:wrap;gap:6px}
 .fav-chip{display:inline-flex;align-items:center;gap:6px;background:var(--tint);
-  border:1px solid var(--lineL);border-radius:999px;padding:5px 6px 5px 12px;
-  font-size:.8rem;color:#2c4a3c;font-weight:600}
+  border:1px solid var(--lineL);border-radius:999px;padding:5px 6px 5px 12px;font-size:.8rem;
+  color:#2c4a3c;font-weight:600}
 .fav-chip button{border:none;background:transparent;cursor:pointer;font-family:inherit;color:inherit;font-weight:600;padding:0}
 .fav-chip .load{color:var(--accent-d)}
 .fav-chip .del{color:#b04a3a;font-size:1rem;line-height:1;width:18px;height:18px;border-radius:50%}
-.fav-chip .del:hover{background:rgba(176,74,58,.12)}
 .fav-empty{font-size:.78rem;color:#9aa39d;font-style:italic}
 
-/* try / response modal-ish area */
-.resp{margin:8px 18px 4px;border-top:1px dashed var(--lineL);padding-top:12px;display:none}
-.resp.show{display:block}
-.resp .rh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.resp .rh .rt{font-weight:800;font-size:.9rem;color:var(--bg2)}
-.resp .rh .rx{border:none;background:transparent;cursor:pointer;color:#8a958d;font-size:1.1rem;font-family:inherit}
-.resp .rbody{background:#0e2130;color:#e8eef1;border-radius:10px;padding:14px;
-  font-size:.88rem;line-height:1.65;max-height:38vh;overflow:auto;white-space:pre-wrap}
-.resp .rbody.loading{color:var(--muted);font-style:italic}
-.spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(63,174,127,.3);
-  border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:7px}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-footer{text-align:center;color:var(--muted);font-size:.8rem;padding:6px 20px 40px;font-style:italic}
-
-/* focus visibility */
+.tip{background:var(--tint);border-left:4px solid var(--accent);border-radius:8px;padding:11px 14px;
+  margin:10px 18px 16px;font-size:.81rem;color:#2c4a3c}
+.tip b{color:var(--accent-d)}
+footer{text-align:center;color:var(--muted);font-size:.8rem;padding:0 20px 40px;font-style:italic}
 .chip:focus-visible,.opt:focus-visible,.btn:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
-@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="eyebrow">Interaktivni nacrt · 4 sloja</div>
+  <div class="eyebrow">Interaktivni nacrt · 5 soba</div>
   <h1>Generator prompta</h1>
-  <p>Izaberi profil, pa „opremi“ svaku sobu opcijama. Prompt se sastavlja uživo desno — kopiraj i zalepi u Claude.</p>
+  <p>Biraš samo ono što želiš — ništa se ne dodaje samo od sebe. Prompt se sastavlja uživo desno.</p>
 </header>
 
 <div class="app">
-
-  <!-- LEFT: builder -->
   <div class="builder">
 
     <div class="profiles">
-      <div class="blabel">Ko si? (profil)</div>
+      <div class="blabel">Predlog polaznih opcija (nije obavezno)</div>
       <div class="chips" id="profiles"></div>
+      <div class="phint">Profil samo <b>predloži</b> opcije i odmah ih vidiš označene — sve možeš isključiti klikom.</div>
     </div>
 
-    <!-- Room 1 -->
     <section class="room">
-      <div class="room-head">
-        <div class="rnum">1</div>
-        <div><h2>Ulaz — uloga i zadatak</h2><div class="rsub">Ko govori, o čemu, i šta tačno traži</div></div>
-      </div>
-
+      <div class="room-head"><div class="rnum">1</div>
+        <div><h2>Ulaz — uloga i zadatak</h2><div class="rsub">Ko govori i šta se traži</div></div></div>
       <div class="field">
-        <div class="flab">Uloga koju Claude preuzima <span class="hint">(1 izbor)</span></div>
+        <div class="flab">Uloga <span class="hint">(1 izbor)</span></div>
         <div class="opts" data-group="role" data-single="1"></div>
       </div>
-
       <div class="field">
-        <div class="flab">Kontekst <span class="hint">(2 rečenice — dopuni po potrebi)</span></div>
-        <textarea class="ctx" id="ctx" placeholder="npr. Predajem OS učenicima 2. razreda ETR profila. Grupa ima različite nivoe predznanja."></textarea>
+        <div class="flab">Kontekst <span class="hint">(slobodan tekst — 1–2 rečenice)</span></div>
+        <textarea class="ctx" id="ctx" placeholder="Ko si, za koga je zadatak, koje su okolnosti."></textarea>
       </div>
-
       <div class="field">
-        <div class="flab">Zadatak <span class="hint">(1 izbor)</span></div>
+        <div class="flab">Šta treba uraditi <span class="hint">(1 izbor)</span></div>
         <div class="opts" data-group="task" data-single="1"></div>
       </div>
     </section>
 
-    <!-- Room 2 -->
     <section class="room">
-      <div class="room-head">
-        <div class="rnum">2</div>
-        <div><h2>Obrada — kako da razmišlja</h2><div class="rsub">Ton, dubina i ograničenja</div></div>
-      </div>
+      <div class="room-head"><div class="rnum">2</div>
+        <div><h2>Obrada — pristup</h2><div class="rsub">Ton i dubina obrade</div></div></div>
       <div class="field">
-        <div class="flab">Pristup / temperatura <span class="hint">(1 izbor)</span></div>
+        <div class="flab">Ton <span class="hint">(1 izbor)</span></div>
         <div class="opts" data-group="mode" data-single="1"></div>
       </div>
       <div class="field">
-        <div class="flab">Dubina obrade <span class="hint">(1 izbor)</span></div>
+        <div class="flab">Dubina <span class="hint">(1 izbor)</span></div>
         <div class="opts" data-group="depth" data-single="1"></div>
       </div>
     </section>
 
-    <!-- Room 3 -->
     <section class="room">
-      <div class="room-head">
-        <div class="rnum">3</div>
-        <div><h2>Memorija — kontekst i pravila</h2><div class="rsub">Šta da uzme u obzir; može više</div></div>
-      </div>
+      <div class="room-head"><div class="rnum">3</div>
+        <div><h2>Pravila — na šta da pazi</h2><div class="rsub">Više izbora</div></div></div>
       <div class="field">
-        <div class="flab">Pravila i reference <span class="hint">(više izbora)</span></div>
+        <div class="flab">Pravila <span class="hint">(više izbora)</span></div>
         <div class="opts" data-group="memory"></div>
       </div>
     </section>
 
-    <!-- Room 4 -->
     <section class="room">
-      <div class="room-head">
-        <div class="rnum">4</div>
-        <div><h2>Izvršenje — oblik izlaza</h2><div class="rsub">Kako izgleda rezultat</div></div>
-      </div>
+      <div class="room-head"><div class="rnum">4</div>
+        <div><h2>Izlaz — oblik rezultata</h2><div class="rsub">Kako izgleda odgovor</div></div></div>
       <div class="field">
-        <div class="flab">Format izlaza <span class="hint">(1 izbor)</span></div>
+        <div class="flab">Format <span class="hint">(1 izbor)</span></div>
         <div class="opts" data-group="format" data-single="1"></div>
       </div>
     </section>
 
-    <!-- Room 5 -->
     <section class="room">
-      <div class="room-head">
-        <div class="rnum">5</div>
-        <div><h2>Specifika — šta ti tačno treba</h2><div class="rsub">Konkretni detalji: tema, broj, verzija, ime…</div></div>
-      </div>
+      <div class="room-head"><div class="rnum">5</div>
+        <div><h2>Specifika — šta ti tačno treba</h2><div class="rsub">Najvažnija soba: tema, broj, obim, publika</div></div></div>
       <div class="field">
-        <div class="flab">Detalji zahteva <span class="hint">(slobodan tekst — najvažniji deo)</span></div>
-        <textarea class="ctx" id="spec" placeholder="npr. Tema: virtuelizacija i VirtualBox. 10 pitanja, srednja težina, jedno tačno od 4."></textarea>
-        <div class="opts" id="specHints" style="margin-top:9px"></div>
+        <div class="flab">Detalji <span class="hint">(dodaj po stavku — Enter ili „Dodaj“)</span></div>
+        <div class="spec-input">
+          <input type="text" id="specInput" placeholder="npr. Tema: virtuelizacija · 10 pitanja · obim: 2 strane">
+          <button class="btn-add" id="specAdd" type="button">Dodaj</button>
+        </div>
+        <div class="spec-list" id="specList"></div>
+        <div class="flab" style="margin:14px 0 8px">Univerzalne stavke <span class="hint">(klik dodaje)</span></div>
+        <div class="opts" id="specUni"></div>
       </div>
     </section>
 
   </div>
 
-  <!-- RIGHT: live prompt -->
   <div class="panel">
     <div class="panel-card">
       <div class="panel-top">
         <div class="pt-title">Tvoj <span>prompt</span></div>
         <div class="badge" id="wc">0 reči</div>
       </div>
-      <div class="prompt-body mono" id="out"><span class="empty">Počni tako što izabereš profil iznad — prompt se pojavljuje ovde…</span></div>
-      <div class="copied" id="copied">Kopirano u clipboard ✓</div>
+      <div class="prompt-body mono" id="out"><span class="empty">Izaberi opcije levo — prompt se pojavljuje ovde…</span></div>
+      <div class="warn" id="warn"></div>
+      <div class="copied" id="copied">Kopirano ✓</div>
       <div class="actions">
-        <button class="btn copy" id="copyBtn">Kopiraj prompt</button>
+        <button class="btn copy" id="copyBtn">Kopiraj</button>
+        <button class="btn share" id="shareBtn">🔗 Podeli</button>
+      </div>
+      <div class="sharebox" id="sharebox">
+        <textarea id="shareText" readonly></textarea>
+        <div class="sb-hint">Tekst je označen — drži prst/desni klik → <b>Copy</b>, pa nalepi u Viber.</div>
+      </div>
+      <div class="actions" style="padding-top:0">
+        <button class="btn save" id="saveBtn">☆ Sačuvaj</button>
         <button class="btn reset" id="resetBtn">Resetuj</button>
       </div>
-      <div class="fav-row">
-        <button class="btn try" id="tryBtn">⚡ Isprobaj prompt</button>
-        <button class="btn save" id="saveBtn">☆ Sačuvaj kombinaciju</button>
-      </div>
-
-      <div class="resp" id="resp">
-        <div class="rh">
-          <div class="rt">Primer odgovora</div>
-          <button class="rx" id="respClose" aria-label="Zatvori">✕</button>
-        </div>
-        <div class="rbody" id="respBody"></div>
-      </div>
-
       <div class="favs">
         <div class="fl">Sačuvane kombinacije</div>
-        <div class="fav-chips" id="favChips"><span class="fav-empty">Još nema sačuvanih. Klikni „Sačuvaj kombinaciju“.</span></div>
+        <div class="fav-chips" id="favChips"><span class="fav-empty">Još nema sačuvanih.</span></div>
       </div>
-
-      <div class="tip"><b>Savet:</b> „Isprobaj prompt“ pošalje ovaj prompt Claude-u i vrati primer odgovora — dobra provera pre nego što ga upotrebiš u radu.</div>
+      <div class="tip"><b>Savet:</b> najviše dobijaš od sobe 5. Bez konkretne teme, obima i publike, prompt ostaje uopšten.</div>
     </div>
   </div>
-
 </div>
 
-<footer>Konceptualni alat — konkretne vrednosti (modeli, kontekstni prozor) menjaju se sa verzijama.</footer>
+<footer>Sve opcije su neobavezne — prompt sadrži samo ono što si izabrao.</footer>
 
 <script>
-// ---------- DATA ----------
+// ================= DATA (univerzalno, bez uskih pretpostavki) =================
 const OPTS = {
   role: [
-    {id:"nastavnik", t:"Nastavnik srednje škole", txt:"iskusan nastavnik u srednjoj tehničkoj školi"},
-    {id:"profesor", t:"Profesor / predavač", txt:"univerzitetski profesor koji predaje studentima"},
-    {id:"programer", t:"Programer", txt:"iskusan Java/Jakarta EE backend programer"},
-    {id:"swinz", t:"Softverski inženjer", txt:"softverski inženjer sa fokusom na arhitekturu i clean code"},
-    {id:"ucenik", t:"Učenik", txt:"strpljiv tutor koji objašnjava učeniku srednje škole"},
-    {id:"student", t:"Student", txt:"mentor koji vodi studenta kroz gradivo i zadatke"},
-    {id:"mentor", t:"Mentor za razvoj", txt:"mentor za lični razvoj i učenje"},
-    {id:"analiticar", t:"Analitičar tržišta", txt:"analitičar kripto tržišta sa analitičkim, nespekulativnim pristupom"},
-    {id:"pisac", t:"Tehnički pisac", txt:"tehnički pisac koji piše jasnu dokumentaciju za developere"},
+    {id:"strucnjak", t:"Stručnjak za oblast", txt:"stručnjak za oblast o kojoj je reč"},
+    {id:"nastavnik", t:"Nastavnik / predavač", txt:"nastavnik koji objašnjava jasno i strpljivo"},
+    {id:"mentor", t:"Mentor", txt:"mentor koji vodi kroz proces i daje povratnu informaciju"},
+    {id:"programer", t:"Programer", txt:"iskusan programer"},
+    {id:"inzenjer", t:"Inženjer / arhitekta", txt:"inženjer sa fokusom na arhitekturu i održivost"},
+    {id:"analiticar", t:"Analitičar", txt:"analitičar koji radi sa podacima i izvlači zaključke"},
+    {id:"pisac", t:"Pisac / urednik", txt:"pisac koji piše jasno i precizno"},
+    {id:"kriticar", t:"Kritički recenzent", txt:"kritički recenzent koji traži slabe tačke"},
+    {id:"sagovornik", t:"Sagovornik", txt:"pažljiv sagovornik koji pomaže da razmislim naglas"},
   ],
   task: [
-    {id:"test", t:"Napravi test/proveru", txt:"napraviš proveru znanja sa jasno definisanim pitanjima"},
-    {id:"lekcija", t:"Pripremi lekciju", txt:"pripremiš materijal za čas na zadatu temu"},
-    {id:"objasni", t:"Objasni pojam", txt:"objasniš pojam korak po korak, od osnova"},
-    {id:"kod", t:"Napiši/pregledaj kod", txt:"napišeš ili pregledaš kod uz objašnjenje odluka"},
-    {id:"refaktor", t:"Refaktoriši/migriraj", txt:"predložiš refaktorisanje ili plan migracije koda"},
-    {id:"debug", t:"Pronađi grešku", txt:"analiziraš problem i pronađeš uzrok greške"},
-    {id:"rezime", t:"Sažmi materijal", txt:"sažmeš materijal na ključne tačke"},
-    {id:"plan", t:"Napravi plan", txt:"napraviš strukturiran plan ili roadmapu"},
-    {id:"analiza", t:"Analiziraj podatke/trend", txt:"analiziraš podatke ili tržišni trend i izvučeš zaključke"},
-    {id:"dokument", t:"Napiši dokumentaciju", txt:"napišeš tehničku dokumentaciju ili uputstvo"},
+    {id:"objasni", t:"Objasni", txt:"objasniš temu"},
+    {id:"napravi", t:"Napravi / napiši", txt:"napraviš ono što tražim"},
+    {id:"pregledaj", t:"Pregledaj i popravi", txt:"pregledaš postojeće i predložiš popravke"},
+    {id:"analiziraj", t:"Analiziraj", txt:"analiziraš i izvedeš zaključke"},
+    {id:"uporedi", t:"Uporedi opcije", txt:"uporediš opcije i predložiš izbor"},
+    {id:"planiraj", t:"Napravi plan", txt:"napraviš plan sa konkretnim koracima"},
+    {id:"resi", t:"Reši problem", txt:"nađeš uzrok problema i rešenje"},
+    {id:"sazmi", t:"Sažmi", txt:"sažmeš na ključne tačke"},
+    {id:"ideje", t:"Predloži ideje", txt:"predložiš više različitih ideja"},
   ],
   mode: [
-    {id:"fakt", t:"Precizno / faktički", txt:"Budi precizan i faktički, bez ulepšavanja."},
-    {id:"balans", t:"Uravnoteženo", txt:"Drži balans između preciznosti i jasnog objašnjenja."},
-    {id:"kreativ", t:"Kreativno", txt:"Slobodno budi kreativan i predloži više varijanti."},
-    {id:"kritick", t:"Kritički", txt:"Budi kritičan, ukaži na slabe tačke i rizike."},
+    {id:"neutralno", t:"Neutralno", txt:"Piši neutralno i bez ulepšavanja."},
+    {id:"jednostavno", t:"Jednostavno", txt:"Koristi jednostavan jezik, bez nepotrebnog žargona."},
+    {id:"strucno", t:"Stručno", txt:"Koristi stručnu terminologiju."},
+    {id:"kriticki", t:"Kritički", txt:"Budi kritičan i ukaži na slabe tačke i rizike."},
+    {id:"kreativno", t:"Kreativno", txt:"Budi kreativan i ponudi neočekivane uglove."},
   ],
   depth: [
-    {id:"kratko", t:"Kratko i suštinski", txt:"Odgovor drži kratkim i bogatim suštinom."},
-    {id:"korak", t:"Korak po korak", txt:"Vodi me korak po korak kroz rešenje."},
-    {id:"duboko", t:"Detaljna analiza", txt:"Uđi u dubinu i objasni razloge iza svakog koraka."},
+    {id:"kratko", t:"Kratko", txt:"Odgovor drži kratkim."},
+    {id:"srednje", t:"Umereno detaljno", txt:"Daj umereno detaljan odgovor."},
+    {id:"korak", t:"Korak po korak", txt:"Vodi me korak po korak."},
+    {id:"duboko", t:"Detaljno", txt:"Uđi u dubinu i objasni razloge."},
   ],
   memory: [
-    {id:"srpski", t:"Odgovori na srpskom (ekavica)", txt:"Odgovaraj na srpskom jeziku (ekavica)."},
-    {id:"minprosvete", t:"Standardi Ministarstva prosvete", txt:"Poštuj standarde i format Ministarstva prosvete Srbije."},
-    {id:"nivo", t:"Prilagodi nivou publike", txt:"Prilagodi jezik i primere nivou publike."},
-    {id:"primeri", t:"Uključi konkretne primere", txt:"Ilustruj svaku ključnu tačku konkretnim primerom."},
-    {id:"bezvode", t:"Bez opšteg/generičkog sadržaja", txt:"Izbegavaj generičke i uopštene formulacije."},
-    {id:"izvor", t:"Koristi priloženi materijal", txt:"Oslanjaj se na materijal koji sam priložio kao izvor."},
-    {id:"standardi", t:"Prati coding standarde", txt:"Prati uobičajene coding standarde i best practices."},
-    {id:"oprez", t:"Označi nesigurne zaključke", txt:"Jasno označi gde je zaključak nesiguran; ne budi lažno siguran."},
-    {id:"izvori", t:"Navedi izvore/pretpostavke", txt:"Navedi izvore ili pretpostavke na kojima počiva analiza."},
+    {id:"srpski", t:"Na srpskom (ekavica)", txt:"Odgovaraj na srpskom jeziku (ekavica)."},
+    {id:"primeri", t:"Sa primerima", txt:"Potkrepi ključne tačke konkretnim primerima."},
+    {id:"bezvode", t:"Bez uopštavanja", txt:"Izbegavaj generičke formulacije; budi konkretan."},
+    {id:"oprez", t:"Označi nesigurno", txt:"Jasno označi gde nisi siguran; ne izmišljaj."},
+    {id:"pitaj", t:"Pitaj ako fali podatak", txt:"Ako nešto nedostaje da bi zadatak bio jasan, pitaj me."},
+    {id:"alternative", t:"Ponudi alternative", txt:"Ponudi bar jednu alternativu sa obrazloženjem."},
+    {id:"izvori", t:"Navedi pretpostavke", txt:"Navedi pretpostavke na kojima počiva odgovor."},
+    {id:"nivo", t:"Prilagodi publici", txt:"Prilagodi jezik i primere navedenoj publici."},
   ],
   format: [
-    {id:"lista", t:"Numerisana lista", txt:"Format: numerisana lista."},
-    {id:"testklj", t:"Pitanja + ključ na kraju", txt:"Format: pitanja sa ponuđenim odgovorima, ključ na kraju."},
-    {id:"tabela", t:"Tabela", txt:"Format: pregledna tabela."},
-    {id:"docx", t:"DOCX dokument", txt:"Format: DOCX dokument spreman za štampu."},
-    {id:"html", t:"HTML (artifakt)", txt:"Format: samostalan HTML fajl (interaktivan artifakt)."},
-    {id:"kodblok", t:"Kod sa komentarima", txt:"Format: kod u bloku, sa komentarima."},
-    {id:"proza", t:"Kratak tekst", txt:"Format: jasan tekst u pasusima."},
-    {id:"markdown", t:"Markdown dokumentacija", txt:"Format: Markdown sa naslovima, kodom i primerima."},
+    {id:"proza", t:"Tekst u pasusima", txt:"tekst u pasusima."},
+    {id:"lista", t:"Lista", txt:"pregledna lista."},
+    {id:"tabela", t:"Tabela", txt:"tabela."},
+    {id:"koraci", t:"Numerisani koraci", txt:"numerisani koraci."},
+    {id:"kod", t:"Kod sa komentarima", txt:"kod u bloku, sa komentarima."},
+    {id:"markdown", t:"Markdown dokument", txt:"Markdown sa naslovima."},
+    {id:"pitanja", t:"Pitanja + ključ", txt:"pitanja sa odgovorima; ključ na kraju."},
+    {id:"kombinovano", t:"Slobodan izbor", txt:"izaberi oblik koji najbolje odgovara sadržaju."},
   ],
 };
 
-// profil -> podrazumevani izbori
+// univerzalne spec stavke — vrede za bilo koji zadatak
+const SPEC_UNI = [
+  "Tema: ",
+  "Publika: ",
+  "Obim: ",
+  "Rok / vremenski okvir: ",
+  "Nivo znanja: početnik",
+  "Šta već znam: ",
+  "Šta da izbegneš: ",
+  "Kriterijum uspeha: ",
+];
+
+// profili SAMO predlažu — i to je vidljivo označeno
 const PROFILES = {
-  nastavnik: {label:"Nastavnik", role:"nastavnik", task:"test", mode:"fakt", depth:"kratko",
-    memory:["srpski","minprosvete","primeri"], format:"testklj",
-    ctx:"Predajem stručni predmet učenicima srednje tehničke škole. Grupa ima različite nivoe predznanja."},
-  profesor: {label:"Profesor", role:"profesor", task:"lekcija", mode:"balans", depth:"duboko",
-    memory:["srpski","nivo","primeri"], format:"proza",
-    ctx:"Predajem predmet studentima na fakultetu. Cilj je da razumeju koncept, ne samo da zapamte."},
-  programer: {label:"Programer", role:"programer", task:"kod", mode:"fakt", depth:"korak",
-    memory:["standardi","primeri","bezvode"], format:"kodblok",
-    ctx:"Radim na backend projektu u Javi/Jakarta EE. Kod ide u produkciju."},
-  swinz: {label:"SW inženjer", role:"swinz", task:"refaktor", mode:"kritick", depth:"duboko",
-    memory:["standardi","bezvode"], format:"proza",
-    ctx:"Migriramo legacy sistem na noviju arhitekturu. Bitni su održivost i jasne granice modula."},
-  ucenik: {label:"Učenik", role:"ucenik", task:"objasni", mode:"balans", depth:"korak",
-    memory:["srpski","nivo","primeri"], format:"proza",
-    ctx:"Učenik sam srednje škole i prvi put se srećem sa ovom temom."},
-  student: {label:"Student", role:"student", task:"objasni", mode:"balans", depth:"duboko",
-    memory:["srpski","primeri"], format:"lista",
-    ctx:"Student sam i pripremam ispit. Treba mi da razumem gradivo, ne samo definicije."},
-  razvoj: {label:"Lični razvoj", role:"mentor", task:"plan", mode:"balans", depth:"korak",
-    memory:["srpski","primeri","bezvode"], format:"lista",
-    ctx:"Želim da napredujem kroz strukturirano učenje i jasne korake."},
-  analiticar: {label:"Istraživač kripto tržišta", role:"analiticar", task:"analiza", mode:"kritick", depth:"duboko",
-    memory:["oprez","izvori","bezvode"], format:"tabela",
-    ctx:"Istražujem kripto tržište analitički, bez špekulacije. Zanimaju me obrasci u podacima, ne saveti za kupovinu."},
-  pisac: {label:"Tehnički pisac", role:"pisac", task:"dokument", mode:"fakt", depth:"korak",
-    memory:["standardi","primeri","bezvode"], format:"markdown",
-    ctx:"Pišem dokumentaciju za developere koji prvi put koriste sistem. Bitna je jasnoća i tačni primeri."},
+  nastavnik:{label:"Nastava",role:"nastavnik",task:"napravi",mode:"jednostavno",depth:"srednje",memory:["srpski","primeri","nivo"],format:"pitanja"},
+  ucenje:{label:"Učenje",role:"mentor",task:"objasni",mode:"jednostavno",depth:"korak",memory:["srpski","primeri"],format:"proza"},
+  kod:{label:"Programiranje",role:"programer",task:"napravi",mode:"neutralno",depth:"korak",memory:["bezvode","oprez"],format:"kod"},
+  arh:{label:"Arhitektura",role:"inzenjer",task:"pregledaj",mode:"kriticki",depth:"duboko",memory:["alternative","izvori","bezvode"],format:"kombinovano"},
+  analiza:{label:"Analiza",role:"analiticar",task:"analiziraj",mode:"kriticki",depth:"duboko",memory:["oprez","izvori"],format:"tabela"},
+  pisanje:{label:"Pisanje",role:"pisac",task:"napravi",mode:"neutralno",depth:"srednje",memory:["bezvode","primeri"],format:"markdown"},
+  odluka:{label:"Odlučivanje",role:"sagovornik",task:"uporedi",mode:"neutralno",depth:"srednje",memory:["alternative","izvori","pitaj"],format:"tabela"},
+  revizija:{label:"Recenzija",role:"kriticar",task:"pregledaj",mode:"kriticki",depth:"duboko",memory:["bezvode","alternative"],format:"lista"},
 };
 
-// brzi primeri specifike po profilu — klik dopisuje u polje
-const SPEC_HINTS = {
-  nastavnik:["Tema: virtuelizacija i VirtualBox","10 pitanja, srednja težina","Jedno tačno od 4 ponuđena","Dodaj bodovanje i ključ"],
-  profesor:["Tema: procesi i niti u OS","Uključi 2 rešena primera","Poveži sa realnom primenom","Trajanje časa: 45 min"],
-  programer:["Jezik: Java / Jakarta EE 10","Endpoint: JAX-RS resurs","Uključi validaciju i obradu grešaka","Dodaj JUnit test"],
-  swinz:["Migracija: JSF/Seam → Jakarta EE","Fokus: granice modula i CDI","Navedi rizike migracije","Predloži redosled koraka"],
-  ucenik:["Tema: šta je operativni sistem","Objasni kao da prvi put čujem","Daj svakodnevnu analogiju","3 pitanja za samoproveru"],
-  student:["Tema za ispit: sinhronizacija procesa","Ključni pojmovi + definicije","2 tipična ispitna zadatka","Česte greške studenata"],
-  razvoj:["Cilj: čitanje 30 min dnevno","Plan za 4 nedelje","Merljivi koraci","Kako pratiti napredak"],
-  analiticar:["Aktiva: BTC / ETH / SOL","Period: poslednjih 90 dana","Metrika: MA200, volatilnost","Bez saveta za kupovinu"],
-  pisac:["Modul: autentikacija (OTP)","Publika: junior developer","Uključi primer poziva","Dodaj sekciju Troubleshooting"],
-};
+// ================= STATE =================
+const state={role:null,task:null,mode:null,depth:null,memory:[],format:null,spec:[],_profile:null};
 
-// ---------- STATE ----------
-const state = {role:null, task:null, mode:null, depth:null, memory:[], format:null, ctx:"", spec:""};
-
-// ---------- RENDER OPTIONS ----------
+// ================= OPTIONS UI =================
 function renderOpts(){
   document.querySelectorAll('.opts[data-group]').forEach(box=>{
-    const g = box.dataset.group;
-    box.innerHTML = "";
+    const g=box.dataset.group; box.innerHTML="";
     OPTS[g].forEach(o=>{
-      const b = document.createElement('button');
-      b.className = "opt"; b.type="button"; b.textContent=o.t;
-      b.dataset.id=o.id; b.dataset.group=g;
-      b.setAttribute('aria-pressed','false');
+      const b=document.createElement('button');
+      b.className="opt";b.type="button";b.textContent=o.t;
+      b.dataset.id=o.id;b.dataset.group=g;b.setAttribute('aria-pressed','false');
       b.addEventListener('click',()=>toggle(g,o.id,box.dataset.single));
       box.appendChild(b);
     });
   });
 }
-
 function toggle(group,id,single){
-  if(single){ state[group] = (state[group]===id)?null:id; }
-  else{
-    const arr = state[group];
-    const i = arr.indexOf(id);
-    if(i>=0) arr.splice(i,1); else arr.push(id);
-  }
+  if(single){ state[group]=(state[group]===id)?null:id; }
+  else{ const a=state[group],i=a.indexOf(id); i>=0?a.splice(i,1):a.push(id); }
+  state._profile=null; // ručna izmena => više nije "čist" profil
   syncUI(); build();
 }
-
 function syncUI(){
-  document.querySelectorAll('.opt').forEach(b=>{
-    const g=b.dataset.group, id=b.dataset.id;
-    const on = Array.isArray(state[g]) ? state[g].includes(id) : state[g]===id;
-    b.setAttribute('aria-pressed', on?'true':'false');
+  document.querySelectorAll('.opt[data-group]').forEach(b=>{
+    const g=b.dataset.group,id=b.dataset.id;
+    const on=Array.isArray(state[g])?state[g].includes(id):state[g]===id;
+    b.setAttribute('aria-pressed',on?'true':'false');
   });
   document.querySelectorAll('#profiles .chip').forEach(c=>{
-    c.setAttribute('aria-pressed', c.dataset.p===state._profile?'true':'false');
+    c.setAttribute('aria-pressed',c.dataset.p===state._profile?'true':'false');
   });
 }
 
-// ---------- PROFILES ----------
+// ================= PROFILES (samo predlog) =================
 function renderProfiles(){
-  const box = document.getElementById('profiles');
-  Object.entries(PROFILES).forEach(([key,p])=>{
+  const box=document.getElementById('profiles');
+  Object.entries(PROFILES).forEach(([k,p])=>{
     const c=document.createElement('button');
-    c.className="chip"; c.type="button"; c.textContent=p.label;
-    c.dataset.p=key; c.setAttribute('aria-pressed','false');
-    c.addEventListener('click',()=>applyProfile(key));
+    c.className="chip";c.type="button";c.textContent=p.label;
+    c.dataset.p=k;c.setAttribute('aria-pressed','false');
+    c.addEventListener('click',()=>applyProfile(k));
     box.appendChild(c);
   });
 }
 function applyProfile(key){
+  if(state._profile===key){ clearAll(); return; } // ponovni klik = poništi
   const p=PROFILES[key];
-  state.role=p.role; state.task=p.task; state.mode=p.mode; state.depth=p.depth;
-  state.memory=[...p.memory]; state.format=p.format; state.ctx=p.ctx; state._profile=key;
-  document.getElementById('ctx').value=p.ctx;
-  renderSpecHints(key);
-  syncUI(); build();
+  state.role=p.role;state.task=p.task;state.mode=p.mode;state.depth=p.depth;
+  state.memory=[...p.memory];state.format=p.format;state._profile=key;
+  syncUI();build();
 }
-function renderSpecHints(key){
-  const box=document.getElementById('specHints');
-  box.innerHTML="";
-  (SPEC_HINTS[key]||[]).forEach(h=>{
+function clearAll(){
+  state.role=state.task=state.mode=state.depth=state.format=state._profile=null;
+  state.memory=[];
+  syncUI();build();
+}
+
+// ================= SPEC =================
+function renderSpecUni(){
+  const box=document.getElementById('specUni');
+  SPEC_UNI.forEach(s=>{
     const b=document.createElement('button');
-    b.className="opt"; b.type="button"; b.textContent="+ "+h;
-    b.title="Dodaj u polje";
+    b.className="opt";b.type="button";b.textContent="+ "+s.trim();
     b.addEventListener('click',()=>{
-      const ta=document.getElementById('spec');
-      const cur=ta.value.trim();
-      ta.value = cur ? cur+"\n"+h : h;
-      state.spec=ta.value; build();
+      const inp=document.getElementById('specInput');
+      inp.value=s; inp.focus();
+      inp.setSelectionRange(s.length,s.length);
     });
     box.appendChild(b);
   });
 }
+function addSpec(t){
+  const v=(t||"").trim().replace(/[:\-]\s*$/,"");
+  if(!v) return;
+  if(!state.spec.includes(v)) state.spec.push(v);
+  renderSpecList(); build();
+}
+function renderSpecList(){
+  const box=document.getElementById('specList'); box.innerHTML="";
+  state.spec.forEach((s,i)=>{
+    const tag=document.createElement('span'); tag.className="spec-tag";
+    tag.appendChild(document.createTextNode(s));
+    const x=document.createElement('button'); x.type="button"; x.textContent="×";
+    x.setAttribute('aria-label','Ukloni');
+    x.addEventListener('click',()=>{state.spec.splice(i,1);renderSpecList();build();});
+    tag.appendChild(x); box.appendChild(tag);
+  });
+}
 
-// ---------- BUILD PROMPT ----------
-function txt(group,id){ return (OPTS[group].find(o=>o.id===id)||{}).txt || ""; }
+// ================= BUILD =================
+function txt(g,id){return (OPTS[g].find(o=>o.id===id)||{}).txt||"";}
+function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 
 function build(){
   const out=document.getElementById('out');
   const ctxVal=document.getElementById('ctx').value.trim();
-  const parts=[]; const plain=[];
+  const html=[],plain=[];
 
-  if(state.role){
-    parts.push(`<span class="plabel">Uloga:</span> Ti si ${txt('role',state.role)}.`);
-    plain.push(`Uloga: Ti si ${txt('role',state.role)}.`);
-  }
-  if(ctxVal){
-    parts.push(`<span class="plabel">Kontekst:</span> ${escapeHtml(ctxVal)}`);
-    plain.push(`Kontekst: ${ctxVal}`);
-  }
-  if(state.task){
-    parts.push(`<span class="plabel">Zadatak:</span> Treba da ${txt('task',state.task)}.`);
-    plain.push(`Zadatak: Treba da ${txt('task',state.task)}.`);
-  }
+  if(state.role){ html.push(`<span class="plabel">Uloga:</span> Ti si ${txt('role',state.role)}.`);
+    plain.push(`Uloga: Ti si ${txt('role',state.role)}.`); }
+  if(ctxVal){ html.push(`<span class="plabel">Kontekst:</span> ${esc(ctxVal)}`);
+    plain.push(`Kontekst: ${ctxVal}`); }
+  if(state.task){ html.push(`<span class="plabel">Zadatak:</span> Treba da ${txt('task',state.task)}.`);
+    plain.push(`Zadatak: Treba da ${txt('task',state.task)}.`); }
 
-  const constraints=[];
-  if(state.mode) constraints.push(txt('mode',state.mode));
-  if(state.depth) constraints.push(txt('depth',state.depth));
-  state.memory.forEach(id=>constraints.push(txt('memory',id)));
-  if(constraints.length){
-    parts.push(`<span class="plabel">Ograničenja:</span>\n- ${constraints.join('\n- ')}`);
-    plain.push(`Ograničenja:\n- ${constraints.join('\n- ')}`);
+  if(state.spec.length){
+    const s=state.spec.length>1?'- '+state.spec.join('\n- '):state.spec[0];
+    html.push(`<span class="plabel">Konkretno:</span>\n${esc(s)}`);
+    plain.push(`Konkretno:\n${s}`);
   }
 
-  const specVal=document.getElementById('spec').value.trim();
-  if(specVal){
-    const lines=specVal.split('\n').map(s=>s.trim()).filter(Boolean);
-    const specTxt = lines.length>1 ? '- '+lines.join('\n- ') : lines[0];
-    parts.push(`<span class="plabel">Konkretno mi treba:</span>\n${escapeHtml(specTxt)}`);
-    plain.push(`Konkretno mi treba:\n${specTxt}`);
+  const c=[];
+  if(state.mode) c.push(txt('mode',state.mode));
+  if(state.depth) c.push(txt('depth',state.depth));
+  state.memory.forEach(id=>c.push(txt('memory',id)));
+  if(c.length){
+    html.push(`<span class="plabel">Ograničenja:</span>\n- ${c.join('\n- ')}`);
+    plain.push(`Ograničenja:\n- ${c.join('\n- ')}`);
   }
+  if(state.format){ html.push(`<span class="plabel">Format:</span> ${txt('format',state.format)}`);
+    plain.push(`Format: ${txt('format',state.format)}`); }
 
-  if(state.format){
-    parts.push(`<span class="plabel">Format izlaza:</span> ${txt('format',state.format)}`);
-    plain.push(`Format izlaza: ${txt('format',state.format)}`);
+  if(!html.length){
+    out.innerHTML='<span class="empty">Izaberi opcije levo — prompt se pojavljuje ovde…</span>';
+    out.dataset.plain=""; document.getElementById('wc').textContent="0 reči";
+    setWarn(""); return;
   }
-
-  if(parts.length===0){
-    out.innerHTML='<span class="empty">Počni tako što izabereš profil iznad — prompt se pojavljuje ovde…</span>';
-    document.getElementById('wc').textContent="0 reči";
-    out.dataset.plain=""; return;
-  }
-  out.innerHTML=parts.join('\n\n');
+  out.innerHTML=html.join('\n\n');
   out.dataset.plain=plain.join('\n\n');
-  const words=plain.join(' ').split(/\s+/).filter(Boolean).length;
-  document.getElementById('wc').textContent=words+" reči";
+  document.getElementById('wc').textContent=
+    plain.join(' ').split(/\s+/).filter(Boolean).length+" reči";
+
+  // upozorenje: zadatak bez specifike = uopšten prompt
+  if(state.task && state.spec.length===0)
+    setWarn("Nema specifike (soba 5) — prompt je uopšten. Dodaj bar temu i obim.");
+  else setWarn("");
+}
+function setWarn(msg){
+  const w=document.getElementById('warn');
+  if(msg){ w.textContent="⚠ "+msg; w.classList.add('show'); }
+  else w.classList.remove('show');
 }
 
-function escapeHtml(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+// ================= COPY / SHARE =================
+function flash(){ const c=document.getElementById('copied');
+  c.classList.add('show'); setTimeout(()=>c.classList.remove('show'),1600); }
 
-// ---------- COPY / RESET ----------
-document.getElementById('copyBtn').addEventListener('click',()=>{
+async function copyText(t){
+  // 1) moderni API (traži https/secure context)
+  if(navigator.clipboard && window.isSecureContext){
+    try{ await navigator.clipboard.writeText(t); return true; }catch(e){}
+  }
+  // 2) fallback koji radi i u iframe-u
+  try{
+    const ta=document.createElement('textarea');
+    ta.value=t; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    const ok=document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  }catch(e){ return false; }
+}
+
+document.getElementById('copyBtn').addEventListener('click',async()=>{
   const t=document.getElementById('out').dataset.plain||"";
   if(!t) return;
-  navigator.clipboard.writeText(t).then(()=>{
-    const c=document.getElementById('copied'); c.classList.add('show');
-    setTimeout(()=>c.classList.remove('show'),1600);
-  });
+  const ok=await copyText(t);
+  if(ok) flash(); else showShareBox(t);
 });
-document.getElementById('resetBtn').addEventListener('click',()=>{
-  state.role=state.task=state.mode=state.depth=state.format=state._profile=null;
-  state.memory=[]; state.ctx=""; state.spec="";
-  document.getElementById('ctx').value="";
-  document.getElementById('spec').value="";
-  document.getElementById('resp').classList.remove('show');
-  syncUI(); build();
-});
-document.getElementById('ctx').addEventListener('input',build);
-document.getElementById('spec').addEventListener('input',e=>{state.spec=e.target.value;build();});
 
-// ---------- FAVORITES (in-memory za ovu sesiju) ----------
-const favorites=[];
-function snapshot(){
-  return {role:state.role,task:state.task,mode:state.mode,depth:state.depth,
-    memory:[...state.memory],format:state.format,
-    ctx:document.getElementById('ctx').value,spec:document.getElementById('spec').value};
+document.getElementById('shareBtn').addEventListener('click',async()=>{
+  const t=document.getElementById('out').dataset.plain||"";
+  if(!t) return;
+  // 1) sistemsko deljenje (telefon: Viber, poruke, mejl)
+  if(navigator.share){
+    try{ await navigator.share({text:t}); return; }
+    catch(e){ if(e && e.name==='AbortError') return; }
+  }
+  // 2) kopiraj
+  const ok=await copyText(t);
+  if(ok){ flash(); return; }
+  // 3) uvek radi: prikaži tekst označen za ručno kopiranje
+  showShareBox(t);
+});
+
+function showShareBox(t){
+  const box=document.getElementById('sharebox');
+  const ta=document.getElementById('shareText');
+  ta.value=t; box.classList.add('show');
+  ta.focus(); ta.select(); ta.setSelectionRange(0,t.length);
 }
+
+// ================= FAVORITES =================
+const favorites=[];
 function favName(){
   const r=(OPTS.role.find(o=>o.id===state.role)||{}).t||"Prompt";
   const t=(OPTS.task.find(o=>o.id===state.task)||{}).t||"";
   return t? r+" · "+t : r;
 }
 document.getElementById('saveBtn').addEventListener('click',()=>{
-  const plain=document.getElementById('out').dataset.plain||"";
-  if(!plain){ flashSave("Prazan prompt — izaberi bar ulogu."); return; }
-  favorites.push({name:favName(),data:snapshot()});
+  if(!(document.getElementById('out').dataset.plain||"")) return;
+  favorites.push({name:favName(),data:{
+    role:state.role,task:state.task,mode:state.mode,depth:state.depth,
+    memory:[...state.memory],format:state.format,spec:[...state.spec],
+    ctx:document.getElementById('ctx').value}});
   renderFavs();
 });
 function renderFavs(){
   const box=document.getElementById('favChips');
-  if(favorites.length===0){ box.innerHTML='<span class="fav-empty">Još nema sačuvanih. Klikni „Sačuvaj kombinaciju“.</span>'; return; }
+  if(!favorites.length){ box.innerHTML='<span class="fav-empty">Još nema sačuvanih.</span>'; return; }
   box.innerHTML="";
   favorites.forEach((f,i)=>{
     const chip=document.createElement('span'); chip.className="fav-chip";
-    const load=document.createElement('button'); load.className="load"; load.type="button";
-    load.textContent=f.name; load.title="Učitaj";
-    load.addEventListener('click',()=>loadFav(i));
-    const del=document.createElement('button'); del.className="del"; del.type="button";
-    del.textContent="×"; del.title="Obriši"; del.setAttribute('aria-label','Obriši');
-    del.addEventListener('click',()=>{favorites.splice(i,1);renderFavs();});
-    chip.appendChild(load); chip.appendChild(del); box.appendChild(chip);
+    const l=document.createElement('button'); l.className="load"; l.type="button";
+    l.textContent=f.name; l.addEventListener('click',()=>loadFav(i));
+    const d=document.createElement('button'); d.className="del"; d.type="button";
+    d.textContent="×"; d.setAttribute('aria-label','Obriši');
+    d.addEventListener('click',()=>{favorites.splice(i,1);renderFavs();});
+    chip.appendChild(l); chip.appendChild(d); box.appendChild(chip);
   });
 }
 function loadFav(i){
   const d=favorites[i].data;
   state.role=d.role;state.task=d.task;state.mode=d.mode;state.depth=d.depth;
-  state.memory=[...d.memory];state.format=d.format;state._profile=null;
+  state.memory=[...d.memory];state.format=d.format;state.spec=[...(d.spec||[])];
+  state._profile=null;
   document.getElementById('ctx').value=d.ctx||"";
-  document.getElementById('spec').value=d.spec||"";
-  state.spec=d.spec||"";
-  syncUI(); build();
-  document.querySelector('.panel').scrollIntoView({behavior:'smooth',block:'start'});
-}
-function flashSave(msg){
-  const t=document.querySelector('.tip'); const old=t.innerHTML;
-  t.innerHTML='<b>Napomena:</b> '+msg;
-  setTimeout(()=>t.innerHTML=old,2200);
+  renderSpecList(); syncUI(); build();
 }
 
-// ---------- TRY PROMPT (Claude API) ----------
-document.getElementById('respClose').addEventListener('click',()=>{
-  document.getElementById('resp').classList.remove('show');
-});
-document.getElementById('tryBtn').addEventListener('click',async()=>{
-  const prompt=document.getElementById('out').dataset.plain||"";
-  if(!prompt){ flashSave("Prazan prompt — izaberi bar ulogu i zadatak."); return; }
-  const resp=document.getElementById('resp');
-  const body=document.getElementById('respBody');
-  resp.classList.add('show');
-  body.classList.add('loading');
-  body.innerHTML='<span class="spinner"></span>Claude generiše primer odgovora…';
-  try{
-    const r=await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        model:"claude-sonnet-4-6",
-        max_tokens:1000,
-        messages:[{role:"user",content:prompt}]
-      })
-    });
-    const data=await r.json();
-    const text=(data.content||[])
-      .filter(b=>b.type==="text").map(b=>b.text).join("\n").trim();
-    body.classList.remove('loading');
-    body.textContent=text || "Nema tekstualnog odgovora. Pokušaj sa jasnijim zadatkom.";
-  }catch(e){
-    body.classList.remove('loading');
-    body.textContent="Greška pri pozivu: "+e.message+"\nProveri konekciju i pokušaj ponovo.";
-  }
+// ================= RESET =================
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  clearAll();
+  state.spec=[]; renderSpecList();
+  document.getElementById('ctx').value="";
+  document.getElementById('specInput').value="";
+  document.getElementById('sharebox').classList.remove('show');
+  build();
 });
 
-// ---------- INIT ----------
-renderProfiles(); renderOpts(); build();
+// ================= LISTENERS =================
+document.getElementById('ctx').addEventListener('input',build);
+document.getElementById('specAdd').addEventListener('click',()=>{
+  const i=document.getElementById('specInput');
+  addSpec(i.value); i.value=""; i.focus();
+});
+document.getElementById('specInput').addEventListener('keydown',e=>{
+  if(e.key==="Enter"){ e.preventDefault(); addSpec(e.target.value); e.target.value=""; }
+});
+
+// ================= INIT =================
+renderProfiles(); renderOpts(); renderSpecUni(); renderSpecList(); build();
 </script>
 </body>
 </html>
