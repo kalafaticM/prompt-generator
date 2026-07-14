@@ -142,7 +142,13 @@ footer{text-align:center;color:var(--muted);font-size:.8rem;padding:0 20px 40px;
   <div class="builder">
 
     <div class="profiles">
-      <div class="blabel">Predlog polaznih opcija (nije obavezno)</div>
+      <div class="blabel">Šabloni — gotovi dugi promptovi</div>
+      <div class="chips" id="templates"></div>
+      <div class="phint">Šablon popuni <b>sve sobe</b> uključujući pre-korake i strukturu. Zatim samo zameni <b>[UNESI]</b> polja.</div>
+    </div>
+
+    <div class="profiles">
+      <div class="blabel">Ili sastavi sam — predlog opcija</div>
       <div class="chips" id="profiles"></div>
       <div class="phint">Profil samo <b>predloži</b> opcije i odmah ih vidiš označene — sve možeš isključiti klikom.</div>
     </div>
@@ -207,6 +213,35 @@ footer{text-align:center;color:var(--muted);font-size:.8rem;padding:0 20px 40px;
         <div class="spec-list" id="specList"></div>
         <div class="flab" style="margin:14px 0 8px">Univerzalne stavke <span class="hint">(klik dodaje)</span></div>
         <div class="opts" id="specUni"></div>
+      </div>
+    </section>
+
+    <section class="room">
+      <div class="room-head"><div class="rnum">6</div>
+        <div><h2>Pre nego što počne</h2><div class="rsub">Koraci koje model izvede PRE pisanja</div></div></div>
+      <div class="field">
+        <div class="flab">Pre-koraci <span class="hint">(dodaj po korak — Enter ili „Dodaj“)</span></div>
+        <div class="spec-input">
+          <input type="text" id="preInput" placeholder="npr. Prvo izlistaj tipične greške, pa tek onda piši">
+          <button class="btn-add" id="preAdd" type="button">Dodaj</button>
+        </div>
+        <div class="spec-list" id="preList"></div>
+        <div class="flab" style="margin:14px 0 8px">Česti pre-koraci <span class="hint">(klik dodaje)</span></div>
+        <div class="opts" id="preUni"></div>
+      </div>
+    </section>
+
+    <section class="room">
+      <div class="room-head"><div class="rnum">7</div>
+        <div><h2>Struktura rezultata</h2><div class="rsub">Od čega se sastoji i kojim redom</div></div></div>
+      <div class="field">
+        <div class="flab">Delovi i redosled <span class="hint">(slobodan tekst — ovde ide "meso" velikih zadataka)</span></div>
+        <textarea class="ctx" id="struct" style="min-height:120px" placeholder="npr.
+Svaka lekcija, tim redom:
+1. Cilj lekcije
+2. Gramatika sa tabelama
+3. Rečnik u tabeli
+4. Vežba sa rešenjima"></textarea>
       </div>
     </section>
 
@@ -316,6 +351,16 @@ const SPEC_UNI = [
   "Kriterijum uspeha: ",
 ];
 
+// česti pre-koraci — vrede za skoro svaki veći zadatak
+const PRE_UNI = [
+  "Prvo mi postavi pitanja ako nešto nije jasno.",
+  "Prvo proveri aktuelne informacije na vebu.",
+  "Prvo izlistaj tipične greške i zablude u ovoj oblasti.",
+  "Prvo navedi pretpostavke na kojima ćeš raditi.",
+  "Prvo predloži plan pa sačekaj moju potvrdu.",
+  "Označi delove u kojima nisi siguran.",
+];
+
 // profili SAMO predlažu — i to je vidljivo označeno
 const PROFILES = {
   nastavnik:{label:"Nastava",role:"nastavnik",task:"napravi",mode:"jednostavno",depth:"srednje",memory:["srpski","primeri","nivo"],format:"pitanja"},
@@ -328,8 +373,218 @@ const PROFILES = {
   revizija:{label:"Recenzija",role:"kriticar",task:"pregledaj",mode:"kriticki",depth:"duboko",memory:["bezvode","alternative"],format:"lista"},
 };
 
-// ================= STATE =================
-const state={role:null,task:null,mode:null,depth:null,memory:[],format:null,spec:[],_profile:null};
+// ================= ŠABLONI (dugi, strukturisani promptovi) =================
+const TEMPLATES = {
+  jezik:{
+    label:"Kurs jezika (A1)",
+    role:"nastavnik", task:"napravi", mode:"neutralno", depth:"duboko",
+    memory:["srpski","primeri","bezvode"], format:"markdown",
+    ctx:"Ti si iskusan nastavnik stranih jezika i autor udžbenika za nivo A1 (CEFR).",
+    spec:[
+      "Jezik: [UNESI JEZIK]",
+      "Nivo: apsolutni početnik, bez prethodnog znanja",
+      "Cilj: [turistička komunikacija / poslovni kontakt / preseljenje]",
+      "Maternji jezik: srpski (ekavica) — sva objašnjenja na srpskom",
+      "Ritam: 14 dana, jedna lekcija dnevno, 45–60 min"
+    ],
+    pre:[
+      "Proveri kako izgleda standardni A1 program za taj jezik (CEFR, zvanični ispitni programi) i ukratko navedi šta obavezno pokriva.",
+      "Izlistaj specifičnosti jezika koje početniku iz srpskog govornog područja prave najviše problema (pismo, tonovi, padeži, rod, red reči, član, aspekt, izgovor).",
+      "Tek onda napravi kurs."
+    ],
+    struct:`Kurs mora da obuhvati:
+- Pismo i izgovor: alfabet/slogovni sistem, dvoglasi, naglasak/tonovi, interpunkcija.
+- Gramatiku sistematski, od lakšeg ka težem: lične zamenice; "biti" i "imati"; rod i član; padeži ili zamena (predlozi/red reči); pravilni glagoli u sadašnjem vremenu; nepravilni ali neizbežni glagoli; množina; brojevi; pridevi i slaganje; prisvojnost; predlozi za mesto; prošlo vreme; buduće vreme; "hoću/moram/mogu da"; imperativ.
+- Tematski rečnik: pozdravi, brojevi/vreme, hrana i piće, prodavnica i cene, restoran, hotel, saobraćaj, porodica, boje, hitni slučajevi.
+
+Format svake lekcije, tim redom:
+1. Naslov i cilj lekcije (1 rečenica).
+2. Gramatika sa tabelama promene (sva lica / rodovi / padeži) + izdvojena pravila.
+3. Rečnik u tabeli: original | srpska transkripcija sa naglaskom | značenje.
+4. 4–6 primera rečenica.
+5. Kratak dijalog iz stvarne situacije.
+6. Vežba (3–5 zadataka).
+
+Na kraju dokumenta:
+- Kontrolna lista "znam li ovo" (čekboks po lekciji).
+- 40 rečenica za svakodnevne situacije.
+- Preporuka kako dalje (A2 teme).
+- Rešenja svih vežbi.
+
+Dodatno:
+- Uz svaku imenicu navedi član/rod ako jezik to ima.
+- Upozori na "lažne prijatelje" i tipične greške govornika srpskog.`
+  },
+  cas:{
+    label:"Priprema za čas",
+    role:"nastavnik", task:"napravi", mode:"neutralno", depth:"srednje",
+    memory:["srpski","primeri","nivo"], format:"markdown",
+    ctx:"Ti si nastavnik u srednjoj stručnoj školi i pišeš pripremu po važećim standardima.",
+    spec:["Predmet: [UNESI]","Tema časa: [UNESI]","Razred / profil: [UNESI]","Trajanje: 45 min"],
+    pre:[
+      "Navedi ishode učenja za ovu temu prema nastavnom programu.",
+      "Izlistaj tipične zablude učenika o ovoj temi.",
+      "Tek onda napiši pripremu."
+    ],
+    struct:`Priprema mora da sadrži:
+1. Ishodi časa (merljivi, 3–5).
+2. Struktura po fazama sa minutažom: uvod / obrada / vežba / evaluacija.
+3. Ključni pojmovi sa definicijama.
+4. Bar 2 konkretna primera ili demonstracije.
+5. Pitanja za proveru razumevanja (5).
+6. Domaći zadatak.
+7. Predviđene teškoće i kako ih prevazići.`
+  },
+  review:{
+    label:"Code review",
+    role:"inzenjer", task:"pregledaj", mode:"kriticki", depth:"duboko",
+    memory:["bezvode","alternative","oprez"], format:"kombinovano",
+    ctx:"Ti si senior inženjer koji radi ozbiljan code review.",
+    spec:["Jezik / stack: [UNESI]","Modul: [UNESI]","Šta me najviše brine: [UNESI]"],
+    pre:[
+      "Prvo mi reci šta kod radi, svojim rečima, da proverim da smo se razumeli.",
+      "Označi delove koje ne možeš pouzdano da proceniš bez šireg konteksta.",
+      "Tek onda daj nalaze."
+    ],
+    struct:`Nalaze organizuj ovako:
+1. Kritično (bag, rizik po podatke, bezbednost) — sa konkretnim redom koda.
+2. Ozbiljno (dizajn, granice modula, transakcije).
+3. Sitno (imenovanje, stil).
+4. Za svaki nalaz: šta je problem → zašto je problem → konkretna izmena.
+5. Na kraju: šta je urađeno dobro (kratko) i predlog redosleda popravki.`
+  },
+  analiza:{
+    label:"Analiza / istraživanje",
+    role:"analiticar", task:"analiziraj", mode:"kriticki", depth:"duboko",
+    memory:["oprez","izvori","alternative"], format:"kombinovano",
+    ctx:"Ti si analitičar koji ne špekuliše i jasno razdvaja podatak od tumačenja.",
+    spec:["Predmet analize: [UNESI]","Period: [UNESI]","Pitanje na koje tražim odgovor: [UNESI]"],
+    pre:[
+      "Formuliši tačno pitanje na koje analiza odgovara.",
+      "Navedi koji podaci bi bili potrebni i koje od njih zaista imaš.",
+      "Označi gde ćeš morati da pretpostavljaš."
+    ],
+    struct:`Struktura:
+1. Pitanje i zašto je važno.
+2. Podaci i njihova ograničenja.
+3. Nalazi — svaki sa dokazom.
+4. Alternativna objašnjenja istih nalaza.
+5. Šta bi oborilo ovaj zaključak.
+6. Zaključak sa stepenom pouzdanosti.`
+  },
+  ucenje:{
+    label:"Plan učenja",
+    role:"mentor", task:"planiraj", mode:"neutralno", depth:"srednje",
+    memory:["srpski","primeri","pitaj"], format:"markdown",
+    ctx:"Ti si mentor koji pravi realne planove učenja, bez preterivanja.",
+    spec:["Oblast: [UNESI]","Trenutni nivo: [UNESI]","Vreme nedeljno: [UNESI]","Cilj: [UNESI]"],
+    pre:[
+      "Proveri šta je realan opseg za navedeno vreme — ako je cilj nerealan, reci mi to odmah.",
+      "Izlistaj preduslove koje moram da imam."
+    ],
+    struct:`Plan mora da sadrži:
+1. Realna procena: šta je moguće u datom vremenu, šta nije.
+2. Faze sa nedeljama i konkretnim ishodom po fazi.
+3. Za svaku fazu: šta učim, na čemu vežbam, kako proveravam da sam savladao.
+4. Kontrolne tačke — merljivi kriterijumi.
+5. Tipične tačke odustajanja i šta tada raditi.`
+  },
+  migracija:{
+    label:"Migracija modula",
+    role:"inzenjer", task:"planiraj", mode:"kriticki", depth:"duboko",
+    memory:["bezvode","alternative","oprez","izvori"], format:"kombinovano",
+    ctx:"Ti si senior inženjer koji planira migraciju legacy koda bez zaustavljanja rada sistema.",
+    spec:["Modul: [UNESI NAZIV]","Sa: [POSTOJEĆI STACK]","Na: [CILJNI STACK]","Šta modul radi: [UNESI]","Šta NE sme da se pokvari: [UNESI]"],
+    pre:[
+      "Prvo mi reci kako razumeš postojeći modul — šta radi, gde su mu granice. Ako ti fali podatak, pitaj.",
+      "Izlistaj skrivene zavisnosti koje se lako previde (transakcije, session state, scheduler, batch).",
+      "Označi delove koje ne možeš proceniti bez uvida u kod."
+    ],
+    struct:`Plan migracije mora da sadrži:
+1. Inventar: šta postoji sada (klase, servisi, tačke ulaza, baza).
+2. Ciljna arhitektura: šta ide gde, gde su nove granice.
+3. Redosled koraka — svaki korak zasebno deployabilan i povratan.
+4. Za svaki korak: šta se menja → čime se testira → kako se vraća unazad.
+5. Rizici: transakcione granice, stanje sesije, kompatibilnost API-ja, podaci.
+6. Šta ostavljam za kasnije i zašto (svesni tehnički dug).
+7. Signali da je granica loše postavljena.`
+  },
+  radionica:{
+    label:"Radionica za učenike",
+    role:"nastavnik", task:"napravi", mode:"jednostavno", depth:"srednje",
+    memory:["srpski","primeri","nivo","bezvode"], format:"markdown",
+    ctx:"Ti si nastavnik koji vodi interaktivne radionice, ne klasična predavanja.",
+    spec:["Tema radionice: [UNESI]","Uzrast / razred: [UNESI]","Trajanje: [UNESI]","Veličina grupe: [UNESI]"],
+    pre:[
+      "Navedi šta učenik konkretno UME da uradi posle radionice (ne 'razume', nego 'ume da').",
+      "Izlistaj šta obično krene naopako sa tim uzrastom i tom temom."
+    ],
+    struct:`Radionica mora da sadrži:
+1. Ishod: šta učenik ume na kraju (merljivo).
+2. Uvodna kuka — pitanje ili demonstracija koja otvara temu (5 min).
+3. Aktivnost korak po korak, sa minutažom i tačnim uputstvima šta učenici rade.
+4. Šta nastavnik radi dok učenici rade (koja pitanja postavlja, na šta pazi).
+5. Predviđene teškoće i kako reagovati.
+6. Zatvaranje: kako proveriti da je ishod postignut.
+7. Varijanta ako grupa završi ranije / ako zapne.`
+  },
+  dokumentacija:{
+    label:"Tehnička dokumentacija",
+    role:"pisac", task:"napravi", mode:"neutralno", depth:"srednje",
+    memory:["bezvode","primeri","oprez"], format:"markdown",
+    ctx:"Ti si tehnički pisac koji piše za nekog ko prvi put ulazi u sistem.",
+    spec:["Šta dokumentujem: [UNESI]","Publika: [junior dev / kolega / krajnji korisnik]","Šta čitalac već zna: [UNESI]","Obim: [UNESI]"],
+    pre:[
+      "Prvo mi reci šta si razumeo da sistem radi — da proverim da smo se razumeli.",
+      "Izlistaj šta čitalac mora da zna pre nego što uopšte počne."
+    ],
+    struct:`Dokument mora da sadrži:
+1. Čemu služi i kada se koristi (1 pasus, bez uvoda tipa "u današnje vreme").
+2. Preduslovi.
+3. Najkraći put do prvog uspeha — mora da radi kad se prekopira.
+4. Objašnjenje kako stvar zaista funkcioniše.
+5. Česti slučajevi upotrebe, svaki sa primerom.
+6. Troubleshooting: simptom → uzrok → rešenje.
+7. Šta NE raditi i zašto.`
+  },
+  test:{
+    label:"Test / provera znanja",
+    role:"nastavnik", task:"napravi", mode:"neutralno", depth:"srednje",
+    memory:["srpski","nivo","bezvode"], format:"pitanja",
+    ctx:"Ti si nastavnik koji pravi proveru koja meri znanje, a ne pamćenje definicija.",
+    spec:["Predmet: [UNESI]","Tema: [UNESI]","Razred / profil: [UNESI]","Broj pitanja: [UNESI]","Trajanje: [UNESI]"],
+    pre:[
+      "Navedi koje ishode ova provera meri.",
+      "Za svako pitanje reci šta tačno proverava — ako samo proverava pamćenje, zameni ga."
+    ],
+    struct:`Test mora da sadrži:
+1. Pitanja po rastućoj težini (lako → srednje → teško).
+2. Mešavina tipova: prepoznavanje, primena, analiza slučaja.
+3. Distraktori (netačni odgovori) moraju biti uverljivi — zasnovani na tipičnim greškama.
+4. Bodovanje po pitanju.
+5. Ključ sa obrazloženjem zašto je tačan odgovor tačan.
+6. Napomena za nastavnika: šta znači ako učenik pogreši baš to pitanje.`
+  },
+  odluka:{
+    label:"Poređenje i odluka",
+    role:"sagovornik", task:"uporedi", mode:"neutralno", depth:"srednje",
+    memory:["alternative","izvori","oprez","pitaj"], format:"tabela",
+    ctx:"Ti si sagovornik koji pomaže da donesem odluku, a ne da mi je nameće.",
+    spec:["Odluka koju donosim: [UNESI]","Opcije: [UNESI]","Šta mi je najvažnije: [UNESI]","Šta ne smem da izgubim: [UNESI]"],
+    pre:[
+      "Prvo proveri da li sam dobro postavio pitanje — možda je prava odluka drugačija.",
+      "Pitaj me za podatke koji ti fale da bi poređenje bilo pošteno."
+    ],
+    struct:`Struktura:
+1. Da li je pitanje dobro postavljeno — ako nije, koje je pravo pitanje.
+2. Tabela poređenja po kriterijumima koje sam naveo.
+3. Za svaku opciju: pod kojim uslovima je ona ispravan izbor.
+4. Šta se ne vidi na prvi pogled (skriveni troškovi, posledice kasnije).
+5. Šta bi promenilo preporuku.
+6. Preporuka — jasno označena kao preporuka, sa razlogom.`
+  },
+};
+const state={role:null,task:null,mode:null,depth:null,memory:[],format:null,spec:[],pre:[],struct:"",_profile:null,_tpl:null};
 
 // ================= OPTIONS UI =================
 function renderOpts(){
@@ -347,7 +602,7 @@ function renderOpts(){
 function toggle(group,id,single){
   if(single){ state[group]=(state[group]===id)?null:id; }
   else{ const a=state[group],i=a.indexOf(id); i>=0?a.splice(i,1):a.push(id); }
-  state._profile=null; // ručna izmena => više nije "čist" profil
+  state._profile=null; state._tpl=null; // ručna izmena => više nije čist predložak
   syncUI(); build();
 }
 function syncUI(){
@@ -358,6 +613,9 @@ function syncUI(){
   });
   document.querySelectorAll('#profiles .chip').forEach(c=>{
     c.setAttribute('aria-pressed',c.dataset.p===state._profile?'true':'false');
+  });
+  document.querySelectorAll('#templates .chip').forEach(c=>{
+    c.setAttribute('aria-pressed',c.dataset.t===state._tpl?'true':'false');
   });
 }
 
@@ -376,7 +634,8 @@ function applyProfile(key){
   if(state._profile===key){ clearAll(); return; } // ponovni klik = poništi
   const p=PROFILES[key];
   state.role=p.role;state.task=p.task;state.mode=p.mode;state.depth=p.depth;
-  state.memory=[...p.memory];state.format=p.format;state._profile=key;
+  state.memory=[...p.memory];state.format=p.format;
+  state._profile=key;state._tpl=null;
   syncUI();build();
 }
 function clearAll(){
@@ -417,7 +676,65 @@ function renderSpecList(){
   });
 }
 
-// ================= BUILD =================
+// ---- PRE-KORACI ----
+function renderPreUni(){
+  const box=document.getElementById('preUni');
+  PRE_UNI.forEach(s=>{
+    const b=document.createElement('button');
+    b.className="opt";b.type="button";b.textContent="+ "+s.replace(/\.$/,"");
+    b.addEventListener('click',()=>addPre(s));
+    box.appendChild(b);
+  });
+}
+function addPre(t){
+  const v=(t||"").trim();
+  if(!v) return;
+  if(!state.pre.includes(v)) state.pre.push(v);
+  renderPreList(); build();
+}
+function renderPreList(){
+  const box=document.getElementById('preList'); box.innerHTML="";
+  state.pre.forEach((s,i)=>{
+    const tag=document.createElement('span'); tag.className="spec-tag";
+    tag.appendChild(document.createTextNode(s));
+    const x=document.createElement('button'); x.type="button"; x.textContent="×";
+    x.setAttribute('aria-label','Ukloni');
+    x.addEventListener('click',()=>{state.pre.splice(i,1);renderPreList();build();});
+    tag.appendChild(x); box.appendChild(tag);
+  });
+}
+
+// ---- ŠABLONI ----
+function renderTemplates(){
+  const box=document.getElementById('templates');
+  Object.entries(TEMPLATES).forEach(([k,t])=>{
+    const c=document.createElement('button');
+    c.className="chip";c.type="button";c.textContent=t.label;
+    c.dataset.t=k;c.setAttribute('aria-pressed','false');
+    c.addEventListener('click',()=>applyTemplate(k));
+    box.appendChild(c);
+  });
+}
+function applyTemplate(key){
+  if(state._tpl===key){ fullClear(); return; }
+  const t=TEMPLATES[key];
+  state.role=t.role;state.task=t.task;state.mode=t.mode;state.depth=t.depth;
+  state.memory=[...t.memory];state.format=t.format;
+  state.spec=[...(t.spec||[])];state.pre=[...(t.pre||[])];
+  state.struct=t.struct||"";state._profile=null;state._tpl=key;
+  document.getElementById('ctx').value=t.ctx||"";
+  document.getElementById('struct').value=state.struct;
+  renderSpecList();renderPreList();syncUI();build();
+  document.querySelector('.panel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function fullClear(){
+  state.role=state.task=state.mode=state.depth=state.format=null;
+  state._profile=state._tpl=null;
+  state.memory=[];state.spec=[];state.pre=[];state.struct="";
+  document.getElementById('ctx').value="";
+  document.getElementById('struct').value="";
+  renderSpecList();renderPreList();syncUI();build();
+}
 function txt(g,id){return (OPTS[g].find(o=>o.id===id)||{}).txt||"";}
 function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 
@@ -437,6 +754,18 @@ function build(){
     const s=state.spec.length>1?'- '+state.spec.join('\n- '):state.spec[0];
     html.push(`<span class="plabel">Konkretno:</span>\n${esc(s)}`);
     plain.push(`Konkretno:\n${s}`);
+  }
+
+  if(state.pre.length){
+    const s=state.pre.map((x,i)=>`${i+1}. ${x}`).join('\n');
+    html.push(`<span class="plabel">Pre nego što počneš:</span>\n${esc(s)}`);
+    plain.push(`Pre nego što počneš:\n${s}`);
+  }
+
+  const structVal=document.getElementById('struct').value.trim();
+  if(structVal){
+    html.push(`<span class="plabel">Struktura rezultata:</span>\n${esc(structVal)}`);
+    plain.push(`Struktura rezultata:\n${structVal}`);
   }
 
   const c=[];
@@ -460,8 +789,12 @@ function build(){
   document.getElementById('wc').textContent=
     plain.join(' ').split(/\s+/).filter(Boolean).length+" reči";
 
-  // upozorenje: zadatak bez specifike = uopšten prompt
-  if(state.task && state.spec.length===0)
+  // upozorenja po prioritetu
+  const full=plain.join('\n');
+  const nUnesi=(full.match(/\[UNESI[^\]]*\]|\[[^\]]{3,}\/[^\]]+\]/g)||[]).length;
+  if(nUnesi>0)
+    setWarn(`Ima ${nUnesi} nepopunjenih polja u uglastim zagradama — zameni ih pre slanja.`);
+  else if(state.task && state.spec.length===0)
     setWarn("Nema specifike (soba 5) — prompt je uopšten. Dodaj bar temu i obim.");
   else setWarn("");
 }
@@ -532,6 +865,7 @@ document.getElementById('saveBtn').addEventListener('click',()=>{
   favorites.push({name:favName(),data:{
     role:state.role,task:state.task,mode:state.mode,depth:state.depth,
     memory:[...state.memory],format:state.format,spec:[...state.spec],
+    pre:[...state.pre],struct:document.getElementById('struct').value,
     ctx:document.getElementById('ctx').value}});
   renderFavs();
 });
@@ -553,23 +887,31 @@ function loadFav(i){
   const d=favorites[i].data;
   state.role=d.role;state.task=d.task;state.mode=d.mode;state.depth=d.depth;
   state.memory=[...d.memory];state.format=d.format;state.spec=[...(d.spec||[])];
-  state._profile=null;
+  state.pre=[...(d.pre||[])];state.struct=d.struct||"";
+  state._profile=null;state._tpl=null;
   document.getElementById('ctx').value=d.ctx||"";
-  renderSpecList(); syncUI(); build();
+  document.getElementById('struct').value=state.struct;
+  renderSpecList(); renderPreList(); syncUI(); build();
 }
 
 // ================= RESET =================
 document.getElementById('resetBtn').addEventListener('click',()=>{
-  clearAll();
-  state.spec=[]; renderSpecList();
-  document.getElementById('ctx').value="";
+  fullClear();
   document.getElementById('specInput').value="";
+  document.getElementById('preInput').value="";
   document.getElementById('sharebox').classList.remove('show');
-  build();
 });
 
 // ================= LISTENERS =================
 document.getElementById('ctx').addEventListener('input',build);
+document.getElementById('struct').addEventListener('input',build);
+document.getElementById('preAdd').addEventListener('click',()=>{
+  const i=document.getElementById('preInput');
+  addPre(i.value); i.value=""; i.focus();
+});
+document.getElementById('preInput').addEventListener('keydown',e=>{
+  if(e.key==="Enter"){ e.preventDefault(); addPre(e.target.value); e.target.value=""; }
+});
 document.getElementById('specAdd').addEventListener('click',()=>{
   const i=document.getElementById('specInput');
   addSpec(i.value); i.value=""; i.focus();
@@ -579,7 +921,9 @@ document.getElementById('specInput').addEventListener('keydown',e=>{
 });
 
 // ================= INIT =================
-renderProfiles(); renderOpts(); renderSpecUni(); renderSpecList(); build();
+renderTemplates(); renderProfiles(); renderOpts();
+renderSpecUni(); renderPreUni();
+renderSpecList(); renderPreList(); build();
 </script>
 </body>
 </html>
